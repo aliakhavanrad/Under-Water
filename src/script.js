@@ -49,7 +49,7 @@ window.addEventListener('resize', () =>
  * Raycaster
  */
 const mouse = {
-  x: 10000,
+  x: 0,
   y: 0
 }
 
@@ -105,7 +105,7 @@ const controls = new OrbitControls(camera, canvas)
  * Light
  */
 
- const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
+ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
  directionalLight.position.set(0, 0, 1.0)
  scene.add(directionalLight);
 
@@ -114,8 +114,8 @@ const controls = new OrbitControls(camera, canvas)
 scene.add(lightTarget)
 
 
-// const ambientLight = new THREE.AmbientLight(0x000055, 0.6)
-// scene.add(ambientLight)
+const ambientLight = new THREE.AmbientLight(0x00aa00, 0.5)
+scene.add(ambientLight)
 
  /**
   * box
@@ -132,6 +132,24 @@ box.position.set(0, 0, -1)
 
  //scene.add(box)
 
+
+/**
+ * Content Plane
+ */
+
+ const contentPlaneGeo = new THREE.PlaneGeometry(3, 3);
+
+ const texture = textureLoader.load('textures/mahsa.jpg')
+ const contentPlaneMaterial = new THREE.MeshStandardMaterial({
+   
+   map: texture
+ });
+ const contentPlane = new THREE.Mesh(contentPlaneGeo, contentPlaneMaterial);
+ contentPlane.position.set(0, 0, -1)
+ scene.add(contentPlane);
+ 
+ 
+
  /**
   * Plane
   */
@@ -144,7 +162,7 @@ box.position.set(0, 0, -1)
                                           [
                                             {
                                               'uTime': { value: null },
-                                              'uMousePosition': { value: new THREE.Vector2()}
+                                              'uMousePosition': { value: new THREE.Vector2(0.0, 0.0)},
                                             },
                                             THREE.ShaderLib[ 'phong' ].uniforms
                                           ]),
@@ -159,7 +177,7 @@ box.position.set(0, 0, -1)
    // Material attributes from THREE.MeshPhongMaterial
    planeMaterial.color = new THREE.Color( 0x1220d0 );
    planeMaterial.specular = new THREE.Color( 0x1280a3 );
-   planeMaterial.shininess = 50;
+   planeMaterial.shininess = 30;
 
    // Sets the uniforms with the material values
    planeMaterial.uniforms[ 'diffuse' ] =  {value : planeMaterial.color}
@@ -172,22 +190,6 @@ box.position.set(0, 0, -1)
 
   camera.add( plane );
   //scene.add(plane)
-
-
-/**
- * Content Plane
- */
-
-const contentPlaneGeo = new THREE.PlaneGeometry(3, 3);
-
-const texture = textureLoader.load('textures/mahsa.jpg')
-const contentPlaneMaterial = new THREE.MeshStandardMaterial({
-  color: 0xff00ff,
-  map: texture
-});
-const contentPlane = new THREE.Mesh(contentPlaneGeo, contentPlaneMaterial);
-contentPlane.position.set(0, 0, -1)
-scene.add(contentPlane);
 
 
 /**
@@ -247,3 +249,10 @@ const tick = () =>
 }
 
 tick();
+
+
+// we can use gsap to move the light to the pointer, especially when the page is loaded.
+// we need to create content and change it with scrolling
+// for the load stage, we can slowly enter the plane into the screen, so it seems the screen is filled with water (Maybe with the scound of the water. the sound can be persistant)
+// we need to disable the camera controls
+// 
