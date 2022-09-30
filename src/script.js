@@ -1,4 +1,5 @@
 import './style.css'
+
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
@@ -18,7 +19,7 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0xeaeafa)
+//scene.background = new THREE.Color(0xeaeafa)
 /**
  * Sizes
  */
@@ -85,7 +86,7 @@ camera.position.z = 1
 scene.add(camera)
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
+//const controls = new OrbitControls(camera, canvas)
 // controls.enableDamping = true
 // controls.minPolarAngle = 3 * Math.PI / 8; // radians
 // controls.maxPolarAngle = 5 * Math.PI / 8; // radians
@@ -139,14 +140,16 @@ box.position.set(0, 0, -1)
 
  const contentPlaneGeo = new THREE.PlaneGeometry(3, 3);
 
- const texture = textureLoader.load('textures/mahsa.jpg')
+ //const texture = textureLoader.load('textures/mahsa.jpg')
+ const texture = textureLoader.load('textures/RM_Logo.png')
+ 
  const contentPlaneMaterial = new THREE.MeshStandardMaterial({
-   
+   transparent: true, 
    map: texture
  });
  const contentPlane = new THREE.Mesh(contentPlaneGeo, contentPlaneMaterial);
  contentPlane.position.set(0, 0, -1)
- scene.add(contentPlane);
+ //scene.add(contentPlane);
  
  
 
@@ -189,7 +192,7 @@ box.position.set(0, 0, -1)
   plane.position.set(0, 0, -1);
 
   camera.add( plane );
-  //scene.add(plane)
+  // scene.add(plane)
 
 
 /**
@@ -198,7 +201,9 @@ box.position.set(0, 0, -1)
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true,
+    alpha: true
 })
+renderer.setClearAlpha(0)
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(window.devicePixelRatio)
 
@@ -240,7 +245,7 @@ const tick = () =>
     }
 
 
-    controls.update()
+    //controls.update()
 
     // Render
     renderer.render(scene, camera)
@@ -253,6 +258,7 @@ tick();
 
 // we can use gsap to move the light to the pointer, especially when the page is loaded.
 // we need to create content and change it with scrolling
-// for the load stage, we can slowly enter the plane into the screen, so it seems the screen is filled with water (Maybe with the scound of the water. the sound can be persistant)
+// for the load stage, we can slowly enter the plane into the screen, so it seems the screen is filled with water (Maybe with the sound of the water. the sound can be persistant)
 // we need to disable the camera controls
-// 
+// after several minutes, the wave becomes weird
+// witth scrolling, increase the raduis of the light

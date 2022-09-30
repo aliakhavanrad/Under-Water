@@ -29,8 +29,7 @@ varying vec2 vUv;
 
 float getZ(float x, float y)
 {
-	return sin((x) * 55.0 + 5.0 * uTime) * cos((2.0 * y + 0.5) * 20.0 + 3.0 * uTime) * 0.05 + 
-		   abs(sin((x + 1.0)  * uTime) * 0.006);
+	return sin((x) * 55.0 + 5.0 * uTime) * cos((2.0 * y + 0.5) * 20.0 + 3.0 * uTime) * 0.05;
 }
 
 void main() {

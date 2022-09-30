@@ -8,7 +8,8 @@ module.exports = {
     output:
     {
         filename: 'bundle.[contenthash].js',
-        path: path.resolve(__dirname, '../dist')
+        path: path.resolve(__dirname, '../dist'),
+        assetModuleFilename: 'images/[hash][ext][query]'
     },
     devtool: 'source-map',
     plugins:
@@ -20,7 +21,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../src/index.html'),
-            minify: true
+            // minify: true
         }),
         new MiniCSSExtractPlugin()
     ],
@@ -55,19 +56,22 @@ module.exports = {
             },
 
             // Images
-            {
-                test: /\.(jpg|png|gif|svg)$/,
-                use:
-                [
-                    {
-                        loader: 'file-loader',
-                        options:
-                        {
-                            outputPath: 'assets/images/'
-                        }
-                    }
-                ]
-            },
+            // {
+            //     test: /\.(jpg|png|gif|svg)$/,
+            //     use:
+            //     [
+            //         {
+            //             loader: 'file-loader',
+            //             options:
+            //             {
+            //                 name: '[name].[ext]',
+            //                 outputPath: 'img/',
+            //                 publicPath: 'img/'
+
+            //             }
+            //         }
+            //     ]
+            // },
 
             // Fonts
             {
