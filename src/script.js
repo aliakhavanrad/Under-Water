@@ -5,11 +5,24 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import planeVertexShader from './shaders/plane/vertex.glsl'
 import planeFragmentShader from './shaders/plane/fragment.glsl'
-import { CubeCamera } from 'three'
+import gsap from 'gsap'
 
 /**
  * Constants
  */
+
+
+ const DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY = 10;
+
+const planeUniforms = 
+{
+  diffuse : {value : new THREE.Color( 0x1220d0 )},
+  specular : {value : new THREE.Color( 0x1280a3 )},
+  shininess : {value :  60},
+  opacity : {value : 1.0},
+  uMouseTransparencySensitivity : {value : DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY}
+}
+
 
 /**
  * Base
@@ -59,8 +72,8 @@ window.addEventListener('mousemove', (event) => {
   const newPositionX = event.clientX / sizes.width * 2 - 1
   const newPositionY = -(event.clientY / sizes.height) * 2 + 1
 
-    mouse.x = newPositionX
-    mouse.y = newPositionY
+  gsap.to(mouse, { x: newPositionX, duration: 1 })
+  gsap.to(mouse, { y: newPositionY, duration: 1 })
 
 })
 
@@ -106,7 +119,7 @@ scene.add(camera)
  * Light
  */
 
- const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.55);
  directionalLight.position.set(0, 0, 1.0)
  scene.add(directionalLight);
 
@@ -119,45 +132,10 @@ const ambientLight = new THREE.AmbientLight(0x00aa00, 0.5)
 scene.add(ambientLight)
 
  /**
-  * box
-  */
-
- const box = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshStandardMaterial({color: 0x00aa00})
- )
-
- 
-box.rotation.set(1, 0, -1)
-box.position.set(0, 0, -1)
-
- //scene.add(box)
-
-
-/**
- * Content Plane
- */
-
- const contentPlaneGeo = new THREE.PlaneGeometry(3, 3);
-
- //const texture = textureLoader.load('textures/mahsa.jpg')
- const texture = textureLoader.load('textures/RM_Logo.png')
- 
- const contentPlaneMaterial = new THREE.MeshStandardMaterial({
-   transparent: true, 
-   map: texture
- });
- const contentPlane = new THREE.Mesh(contentPlaneGeo, contentPlaneMaterial);
- contentPlane.position.set(0, 0, -1)
- //scene.add(contentPlane);
- 
- 
-
- /**
   * Plane
   */
 
-  const planeGeometry = new THREE.PlaneGeometry(4, 4, 100, 100);
+  const planeGeometry = new THREE.PlaneGeometry(8, 8, 200, 200);
   const planeMaterial = new THREE.ShaderMaterial(
     {
       transparent: true,
@@ -166,6 +144,7 @@ box.position.set(0, 0, -1)
                                             {
                                               'uTime': { value: null },
                                               'uMousePosition': { value: new THREE.Vector2(0.0, 0.0)},
+                                              'uMouseTransparencySensitivity': { value: null},
                                             },
                                             THREE.ShaderLib[ 'phong' ].uniforms
                                           ]),
@@ -177,16 +156,13 @@ box.position.set(0, 0, -1)
  
     planeMaterial.lights = true;
 
-   // Material attributes from THREE.MeshPhongMaterial
-   planeMaterial.color = new THREE.Color( 0x1220d0 );
-   planeMaterial.specular = new THREE.Color( 0x1280a3 );
-   planeMaterial.shininess = 30;
-
    // Sets the uniforms with the material values
-   planeMaterial.uniforms[ 'diffuse' ] =  {value : planeMaterial.color}
-   planeMaterial.uniforms[ 'specular' ] = {value : planeMaterial.specular}
-   planeMaterial.uniforms[ 'shininess' ] = {value :  planeMaterial.shininess};
-   planeMaterial.uniforms[ 'opacity' ]= {value : 0.8};
+   planeMaterial.uniforms[ 'diffuse' ] =  planeUniforms.diffuse; // {value : new THREE.Color( 0x1220d0 )}
+   planeMaterial.uniforms[ 'specular' ] = planeUniforms.specular; // {value : new THREE.Color( 0x1280a3 )}
+   planeMaterial.uniforms[ 'shininess' ] = planeUniforms.shininess; // {value :  60};
+   planeMaterial.uniforms[ 'opacity' ]= planeUniforms.opacity; // {value : 1.0};
+   planeMaterial.uniforms[ 'uMouseTransparencySensitivity' ]=  planeUniforms.uMouseTransparencySensitivity; //{value : DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY};
+   
  
   const plane = new THREE.Mesh(planeGeometry, planeMaterial)
   plane.position.set(0, 0, -1);
@@ -207,6 +183,7 @@ renderer.setClearAlpha(0)
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(window.devicePixelRatio)
 
+
 /**
  * Animate
  */
@@ -219,13 +196,11 @@ const tick = () =>
     const deltaTime = elapsedTime - lastElapsedTime
     lastElapsedTime = elapsedTime
 
-
-
-    box.rotateZ(deltaTime)
-
-
     planeMaterial.uniforms.uTime.value = elapsedTime;
 
+    // planeUniforms.uMouseTransparencySensitivity.value = DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY - scrollY / sizes.height * 4;
+    
+    // planeMaterial.uniforms.uMouseTransparencySensitivity.value = uMouseTransparencySensitivity;
 
     /**
      * Raycaster
@@ -244,7 +219,6 @@ const tick = () =>
       
     }
 
-
     //controls.update()
 
     // Render
@@ -254,6 +228,31 @@ const tick = () =>
 }
 
 tick();
+
+function  createBlockElements(){
+
+  const block1 = document.createElement("div")
+  block1.classList ="block green red-text";
+  block1.innerHTML = "<h1>WOMAN</h1>"
+
+  const block2 = document.createElement("div")
+  block2.classList ="block white green-text";
+  block2.innerHTML = "<h1>LIFE</h1>"
+
+  const block3 = document.createElement("div")
+  block3.classList ="block red white-text";
+  block3.innerHTML = "<h1>FREEDOM</h1>"
+
+  document.body.appendChild(block1);
+  document.body.appendChild(block2);
+  document.body.appendChild(block3);
+}
+
+createBlockElements();
+
+  //  <div class="block green"><h1>WOMAN</h1></div>
+  //   <div class="block white"><h1>LIFE</h1></div>
+  //   <div class="block red"><h1>FREEDOM</h1></div>
 
 
 // we can use gsap to move the light to the pointer, especially when the page is loaded.

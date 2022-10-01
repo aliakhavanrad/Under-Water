@@ -10,8 +10,9 @@ uniform float opacity;
 uniform sampler2D uTexture;
 
 uniform vec2 uMousePosition;
+uniform float uTime;
+uniform float uMouseTransparencySensitivity;
 
-//varying vec2 vMousePosition;
 varying vec2 vUv;
 
 #include <common>
@@ -43,11 +44,13 @@ void main() {
 
 	#include <clipping_planes_fragment>
 
-	float distanceFromMouse = distance(vUv, uMousePosition) ;
-	float mouseTransparency = 1.0 - distanceFromMouse * 15.0; 
+	float distanceFromMouse = distance(vUv, uMousePosition);
+	float mouseTransparency = min(distanceFromMouse * uMouseTransparencySensitivity + clamp(1.0 - uTime * 0.1, 0.3, 1.0) , 1.0); 
+	float computedOpacity = opacity * mouseTransparency;
+
 
 	// vec4 diffuseColor = vec4( diffuse, opacity );
-	vec4 diffuseColor = vec4( diffuse, opacity - mouseTransparency);
+	vec4 diffuseColor = vec4( diffuse, computedOpacity);
 	
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
