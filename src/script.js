@@ -1,7 +1,6 @@
 import './style.css'
 
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import planeVertexShader from './shaders/plane/vertex.glsl'
 import planeFragmentShader from './shaders/plane/fragment.glsl'
@@ -12,18 +11,20 @@ import gsap from 'gsap'
  */
 
 
- const DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY = 10;
+ const PLANE_SHININESS = 40;
 
 const planeUniforms = 
 {
+  uTime : {value : 0},
   diffuse : {value : new THREE.Color( 0x1220d0 )},
   specular : {value : new THREE.Color( 0x1280a3 )},
-  shininess : {value :  60},
+  shininess : {value :  PLANE_SHININESS},
   opacity : {value : 1.0},
-  uMouseTransparencySensitivity : {value : DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY}
+  uMouseTransparencySensitivity : {value : 10}
 }
 
-
+const sound = new Audio('sounds/waves.mp3')
+sound.volume = 0.3;
 /**
  * Base
  */
@@ -79,15 +80,6 @@ window.addEventListener('mousemove', (event) => {
 
 const raycaster = new THREE.Raycaster();
 
-
-/**
- * Loaders
- */
-
- const textureLoader = new THREE.TextureLoader();    
-
-
-
 /**
  * Camera
  */
@@ -97,17 +89,6 @@ camera.position.x = 0
 camera.position.y = 0
 camera.position.z = 1
 scene.add(camera)
-
-// Controls
-//const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
-// controls.minPolarAngle = 3 * Math.PI / 8; // radians
-// controls.maxPolarAngle = 5 * Math.PI / 8; // radians
-
-// controls.minAzimuthAngle = - Math.PI / 16
-// controls.maxAzimuthAngle = Math.PI / 16
-// controls.minDistance = 50
-// controls.maxDistance = 450
 
 /**
  * Axis Helper
@@ -135,7 +116,7 @@ scene.add(ambientLight)
   * Plane
   */
 
-  const planeGeometry = new THREE.PlaneGeometry(8, 8, 200, 200);
+  const planeGeometry = new THREE.PlaneGeometry(6, 6, 200, 200);
   const planeMaterial = new THREE.ShaderMaterial(
     {
       transparent: true,
@@ -157,6 +138,7 @@ scene.add(ambientLight)
     planeMaterial.lights = true;
 
    // Sets the uniforms with the material values
+   planeMaterial.uniforms[ 'uTime' ] =  planeUniforms.uTime; 
    planeMaterial.uniforms[ 'diffuse' ] =  planeUniforms.diffuse; // {value : new THREE.Color( 0x1220d0 )}
    planeMaterial.uniforms[ 'specular' ] = planeUniforms.specular; // {value : new THREE.Color( 0x1280a3 )}
    planeMaterial.uniforms[ 'shininess' ] = planeUniforms.shininess; // {value :  60};
@@ -168,8 +150,7 @@ scene.add(ambientLight)
   plane.position.set(0, 0, -1);
 
   camera.add( plane );
-  // scene.add(plane)
-
+ 
 
 /**
  * Renderer
@@ -183,6 +164,16 @@ renderer.setClearAlpha(0)
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(window.devicePixelRatio)
 
+/**
+ * 
+ */
+window.addEventListener('click', () => {
+  var tl = gsap.timeline();
+  tl.to(planeUniforms.shininess, { value: PLANE_SHININESS + 80, duration: 0.4});
+  tl.to(planeUniforms.shininess, { value: PLANE_SHININESS, duration: 0.2});
+  
+  sound.play();
+})
 
 /**
  * Animate
@@ -196,11 +187,7 @@ const tick = () =>
     const deltaTime = elapsedTime - lastElapsedTime
     lastElapsedTime = elapsedTime
 
-    planeMaterial.uniforms.uTime.value = elapsedTime;
-
-    // planeUniforms.uMouseTransparencySensitivity.value = DEFAULT_MOUSE_TRANSPARENCY_SENSITIVITY - scrollY / sizes.height * 4;
-    
-    // planeMaterial.uniforms.uMouseTransparencySensitivity.value = uMouseTransparencySensitivity;
+    planeUniforms.uTime.value = elapsedTime;
 
     /**
      * Raycaster
@@ -211,16 +198,13 @@ const tick = () =>
     if(intersect.length){
 
       lightTarget.position.set( -intersect[0].point.x, -intersect[0].point.y, intersect[0].point.z)
-      //lightTarget.updateMatrixWorld();
 
       planeMaterial.uniforms.uMousePosition.value = intersect[0].uv;
-      //positionUniforms[MOUSE_POSITION_UNIFORM].value.set(intersect[0].uv.x,intersect[0].uv.y)
+      
     }else{
       
     }
-
-    //controls.update()
-
+    
     // Render
     renderer.render(scene, camera)
 
@@ -249,15 +233,3 @@ function  createBlockElements(){
 }
 
 createBlockElements();
-
-  //  <div class="block green"><h1>WOMAN</h1></div>
-  //   <div class="block white"><h1>LIFE</h1></div>
-  //   <div class="block red"><h1>FREEDOM</h1></div>
-
-
-// we can use gsap to move the light to the pointer, especially when the page is loaded.
-// we need to create content and change it with scrolling
-// for the load stage, we can slowly enter the plane into the screen, so it seems the screen is filled with water (Maybe with the sound of the water. the sound can be persistant)
-// we need to disable the camera controls
-// after several minutes, the wave becomes weird
-// witth scrolling, increase the raduis of the light
