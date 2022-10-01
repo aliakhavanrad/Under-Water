@@ -24,7 +24,8 @@ const planeUniforms =
 }
 
 const sound = new Audio('sounds/waves.mp3')
-sound.volume = 0.3;
+sound.volume = 0.02;
+sound.loop = true;
 /**
  * Base
  */
